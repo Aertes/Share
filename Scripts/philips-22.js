@@ -3,7 +3,7 @@
     $.fn.inShare = function (options) {
         var defaults = {
             //domain: "http://widget.itnode.cn/",
-            domain: "https://philips-1.youxiangke.com/",
+            domain: "http://47.92.147.251/",
             localurl: encodeURIComponent(window.location.href),
             nametxt: { "txtc": "&copy;\u4f18\u4eab\u5ba2" },
             popHeight: 445,
@@ -17,7 +17,7 @@
         var options = $.extend(defaults, options);
         var mvbg = $("<div>").addClass("in-share-cvbg modal");
         this.each(function () {
-            var sharetag = new Array('Sina_weibo', 'Renren', 'Tencent_weibo', 'Kaixin001');//20141209
+            var sharetag = new Array('Sina_weibo', 'Renren', 'Tencent_weibo', 'Kaixin001'); //20141209
             var obj = $(this);
             var siteid = obj.attr('uid');
             var surl = obj.attr("surl");
@@ -42,7 +42,7 @@
             //构造开始
             if ($('link[href$="H5share.min.css"]').length == 0) {//构造样式
                 //var css_href = options.domain + 'share.css';
-                var css_href = '/Content/H5share.min.css';
+                var css_href = options.domain+'Content/H5share.min.css';
                 var styleTag = document.createElement("link");
                 styleTag.setAttribute('type', 'text/css');
                 styleTag.setAttribute('rel', 'stylesheet');
@@ -51,7 +51,7 @@
             }
             if ($('link[href$="iconfont.css"]').length == 0) {//构造样式
                 //var css_href = options.domain + 'share.css';
-                var css_href = '/fonts/iconfont.css';
+                var css_href = options.domain+'fonts/iconfont.css';
                 var styleTag = document.createElement("link");
                 styleTag.setAttribute('type', 'text/css');
                 styleTag.setAttribute('rel', 'stylesheet');
@@ -61,20 +61,23 @@
             //分享按钮
             $.each(options.hotjson["icons"], function (index, value) {
                 $("<a>").attr("href", "javascript:void(0)").attr("title", value.title).attr("platform", value.other).attr("platformname", value.name).addClass("in-share-icon1 iconfont " + value.style).appendTo(mli);
+                $("<div>").addClass("in-share-count").appendTo(mli);
+                ma.append(mli);
             });
             obj.empty();
-            ma.append(mli).append($("<li>").addClass("in-share-count").append($("<a>").attr("href", "javascript:void(0)").attr("class", 'num'))).appendTo(obj);
+            //ma.append(mli).append($("<li>").addClass("in-share-count").append($("<a>").attr("href", "javascript:void(0)").attr("class", 'num'))).appendTo(obj);
+            ma.appendTo(obj);
 
             if ($('body').find('.in-share-cp').length == 0) {//判断是否已经存在
-                mc.append($("<div>").addClass("in-share-cpbd").append($("<a>").attr("href", "javascript:void(0)").addClass("in-s-close").html("X").bind('click', function () {
+                mc.append($("<div>").addClass("in-share-cpbd").append($("<a>").attr("href", "javascript:void(0)").addClass("in-s-close").bind('click', function () {
                     mc.hide(); mvbg.hide();
                     $("#in-share-iframe").attr("src", "");
-                })).append($("<div>").attr("class", "in-share-iframeloading")).append(e).append($("<div>").addClass("in-s-foot").html(options.nametxt.txtc))).hide().appendTo($("body"));
+                })).append($("<div>").attr("class", "in-share-iframeloading")).append(e).append($("<div>").addClass("in-s-foot").html())).hide().appendTo($("body"));
                 mvbg.bind('click', function () {
                     $(this).hide(); mc.hide();
                 }).hide().appendTo($("body")[0]);
             }
-            obj.find(".in-share-count").html('<a href="javascript:void(0)" class="num">3K</a>');
+            obj.find(".in-share-count").html('<a href="javascript:void(0)" class="num">0</a>');
 
             obj.find("a").bind("focus", function () {
                 if (this.blur) { this.blur() };
@@ -90,69 +93,46 @@
             } else {
                 url = options.localurl;
             }
-            $.post("/Share/GetURLCount", { 'url': url, 'siteid': siteid, 'time': new Date().getTime(), 'jsoncallback': '?' },
+            $.getJSON(options.domain + "Share/GetURLCount", { 'url': url, 'siteid': siteid, 'time': new Date().getTime(), 'jsoncallback': '?' },
                 function (data) {
-                    obj.find(".in-share-count a").html(data.sharecount);
+                    obj.find(".in-share-count").first().html('<a href="javascript:void(0)" class="num">' + data.sinacount + '</a>');
+                    obj.find(".in-share-count").last().html('<a href="javascript:void(0)" class="num">' + data.weibocount + '</a>');
                     /*$.each(data["share"], function (index, value) {
-                        obj.find(".in-share-count").html(value.sharenum);
-                        if (value.bigpic != "") {
-                            obj.find(".in-share-ad").append($("<img>").attr("src", value.bigpic).attr("alt", value.bigpicalt));
-                            if (value.bigpiclink != "") {
-                                obj.find(".in-share-ad").wrapInner($("<a>").attr("href", value.bigpiclink).attr("target", "_blank"));
-                            }
-                            obj.find(".in-share-ad").show();
-                            adimg.src = value.bigpic;
-                            adpic = "ok";
-                        }
-                        if (value.smallpic != "") {
-                            opentype = (value.opentype != "") ? value.opentype : "click";
-                            ccimg.src = value.smallpic + "?" + new Date().getTime();
-                            $(ccimg).load(function () {
-                                $("<a>").addClass("in-share-more").attr("href", "javascript:void(0)").attr("title", value.smallpicalt).css("background-image", "url(" + value.smallpic + ")").css("width", ccimg.width).bind(opentype, function () {
-                                    obj.find('.in-share-box').show();
-                                    $('.a-share').css('zIndex', '');
-                                    obj.css('zIndex', 100000);
-                                }).show().insertBefore(obj.find(".in-share-count"));
-                                ccimg.src = null;
-                            });
+                    obj.find(".in-share-count").html(value.sharenum);
+                    if (value.bigpic != "") {
+                    obj.find(".in-share-ad").append($("<img>").attr("src", value.bigpic).attr("alt", value.bigpicalt));
+                    if (value.bigpiclink != "") {
+                    obj.find(".in-share-ad").wrapInner($("<a>").attr("href", value.bigpiclink).attr("target", "_blank"));
+                    }
+                    obj.find(".in-share-ad").show();
+                    adimg.src = value.bigpic;
+                    adpic = "ok";
+                    }
+                    if (value.smallpic != "") {
+                    opentype = (value.opentype != "") ? value.opentype : "click";
+                    ccimg.src = value.smallpic + "?" + new Date().getTime();
+                    $(ccimg).load(function () {
+                    $("<a>").addClass("in-share-more").attr("href", "javascript:void(0)").attr("title", value.smallpicalt).css("background-image", "url(" + value.smallpic + ")").css("width", ccimg.width).bind(opentype, function () {
+                    obj.find('.in-share-box').show();
+                    $('.a-share').css('zIndex', '');
+                    obj.css('zIndex', 100000);
+                    }).show().insertBefore(obj.find(".in-share-count"));
+                    ccimg.src = null;
+                    });
     
-                        }
+                    }
                     });*/
                 });
-
-            // 是否为移动端
-            function isMobile() {
-                var sUserAgent = navigator.userAgent.toLowerCase();
-                // var bIsIpad = sUserAgent.match(/ipad/i) == "ipad";
-                var bIsIphoneOs = sUserAgent.match(/iphone os/i) == "iphone os";
-                var bIsMidp = sUserAgent.match(/midp/i) == "midp";
-                var bIsUc7 = sUserAgent.match(/rv:1.2.3.4/i) == "rv:1.2.3.4";
-                var bIsUc = sUserAgent.match(/ucweb/i) == "ucweb";
-                var bIsNokia = sUserAgent.match(/nokia/i) == "nokia";
-                var bIsAndroid = sUserAgent.match(/android/i) == "android";
-                var bIsCE = sUserAgent.match(/windows ce/i) == "windows ce";
-                var bIsWM = sUserAgent.match(/windows mobile/i) == "windows mobile";
-
-                /*document.writeln("您的浏览设备为：");*/
-                if (bIsIphoneOs || bIsMidp || bIsUc7 || bIsUc || bIsNokia || bIsAndroid || bIsCE || bIsWM) {
-                    /* 链接到不同的网址  这个是手机的 */
-                    return true;
-                    
-                } else {
-                    /* 链接到不同的网址  这个是PC的 */
-                    return false;
-                }
-            }
             //初始化添加事件
             obj.find(".in-share-li a").not(".in-share-count").bind("click", function () {
 
                 var vw = '600px';
-                var vh = '335px';
-                var tb = '/Share/Index';
-                if ($(this).hasClass('weixin')) { vw = '250px'; vh = '240px'; tb = 'b.html'; }
-                if(isMobile() && !$(this).hasClass('weixin')){ vw = '100%'; vh = '310px'; }
+                var vh = '435px';
+                var tb = options.domain + 'Share/Index';
+                if ($(this).hasClass('weixin')) { vw = '250px'; vh = '240px'; tb = options.domain + 'qrcode.html'; }
+                if (isMobile() && !$(this).hasClass('weixin')) { vw = '100%'; vh = '350px'; }
                 showshareboxIframe($(this).attr("platform"), $(this).attr("platformname"), surl, simg, stxt, vh, vw, options.domain, siteid, tb);
-                
+
                 mvbg.fadeIn();
 
 
@@ -195,6 +175,29 @@
 var havecheck = 0;
 var pagebigimgs = "";
 var imgflag = 0;
+// 是否为移动端
+function isMobile() {
+    var sUserAgent = navigator.userAgent.toLowerCase();
+    // var bIsIpad = sUserAgent.match(/ipad/i) == "ipad";
+    var bIsIphoneOs = sUserAgent.match(/iphone os/i) == "iphone os";
+    var bIsMidp = sUserAgent.match(/midp/i) == "midp";
+    var bIsUc7 = sUserAgent.match(/rv:1.2.3.4/i) == "rv:1.2.3.4";
+    var bIsUc = sUserAgent.match(/ucweb/i) == "ucweb";
+    var bIsNokia = sUserAgent.match(/nokia/i) == "nokia";
+    var bIsAndroid = sUserAgent.match(/android/i) == "android";
+    var bIsCE = sUserAgent.match(/windows ce/i) == "windows ce";
+    var bIsWM = sUserAgent.match(/windows mobile/i) == "windows mobile";
+
+    /*document.writeln("您的浏览设备为：");*/
+    if (bIsIphoneOs || bIsMidp || bIsUc7 || bIsUc || bIsNokia || bIsAndroid || bIsCE || bIsWM) {
+        /* 链接到不同的网址  这个是手机的 */
+        return true;
+
+    } else {
+        /* 链接到不同的网址  这个是PC的 */
+        return false;
+    }
+}
 function showshareboxIframePosition(pop) {
     var pleft = ($(window).width() - pop.width()) / 2 + $(window).scrollLeft();
     var ptop = ($(window).height() - pop.height()) / 2 + $(window).scrollTop();
@@ -268,7 +271,9 @@ function showshareboxIframe(i, iname, surl, simg, stxt, sheight, swidth, sdomain
     $("#in-share-iframe").attr("src", tb + "?siteid=" + siteid + "&snsname=" + iname + "&url=" + url + "&rurl=" + rurl + "&snsid=" + i + "&shareimg=" + simg + "&pagetitle=" + pagetitle + "&pagedesc=" + stxt);
     $("#in-share-iframe").bind("load", function () {
         $(".in-share-iframeloading").hide();
-        //$("#in-share-iframe").show();
+        //in-share-iframe").show();
+        var $test = $("#in-share-iframe").contents().find(".qr_content");
+        if (isMobile()) { $test.prepend("<h2>长按二维码保存至相册</h2>") }
     });
     showshareboxIframePosition($(".in-share-cp"));
     //b.hide();
