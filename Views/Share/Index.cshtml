@@ -1,8 +1,8 @@
 ﻿
 @{
     Layout = null;
-    string psnsname = (string)TempData["snsname"];
-    string ptext = (string)TempData["pagedesc"];
+    string psnsname = (string)Session["snsname"];
+    string ptext = (string)Session["pagedesc"];
     int ptype = (int)TempData["ptype"];
 }
 
@@ -15,6 +15,16 @@
     <meta http-equiv="P3P" content='CP="IDC DSP COR CURa ADMa  OUR IND PHY ONL COM STA"'>
     <link href="~/Content/H5share.min.css" rel="stylesheet" />
     <link href="~/fonts/iconfont.css" rel="stylesheet" />
+	<style>
+	.success_failure{height:435px;}
+	.successfull{background:url('../../images/1.jpg') no-repeat;background-size:inherit;}
+	.xinlang{float:left;background:url('../../images/xinlang.png') no-repeat;background-size:100%;width:32px;height:32px;}
+	.charsLeft{color:#f60;}
+	.shareImg{width:96%;position:absolute;left:15px;bottom:12px;overflow:hidden;height:72px;}
+	.shareImg li{width:70px;height:70px;float:left;border:1px solid #ccc;margin-right:10px;}
+	.shareImg li a{display:block;width:100%;height:100%;}
+	.shareImg li a img{width:100%;height:100%;background-size:100%;}
+	</style>
     <script src="/Scripts/jquery-1.10.2.min.js"></script>
 
 </head>
@@ -26,26 +36,35 @@
         {
             <div class="qr_sina" style="display:block">
                 <div class="content">
-                    <h2>分享 @psnsname </h2>
-                    <div class="text in-s-text">
-                        <textarea name="txbShare"></textarea>
+                    <h2 style="overflow:hidden;width:190px;margin:0 auto;">
+                        <a href="javascript:;" class="xinlang"></a>
+                        <a style="float:left;margin-left:10px;font-size:22px;line-height:32px;">新浪微博分享</a>
+                    </h2>
+                    <div class="text in-s-text" style="position:relative;">
+                        <textarea name="txbShare">@ptext</textarea>
+			<ul class="shareImg">
+			    <li>
+				<a><img src="../../images/xinlang.png"/></a>
+			    </li>
+			    <li>
+				<a><img src="../../images/1.jpg"/></a>
+			    </li>
+			</ul>
                     </div>
-                    <div class="text_num">
-                        <p>还可以输入<span  class="charsLeft">200</span>字</p>
-                    </div>
-                    <div class="checked">
-                        <div class="attention">
-                            <input type="checkbox" checked="checked" name="cbfollow"/>
-                            <label>是否关注飞利浦中国</label>
-                        </div>
-                        <div class="consent">
-                            <input type="checkbox" name="cbMember" checked="checked"/>
-                            <label>同意成为飞利浦官方网站会员</label>
-                        </div>
-                    </div>
+                    <div style="overflow:hidden;margin:15px 0;">
+			<div class="text_num" style="float:right;">
+                            <p>还可以输入<span  class="charsLeft">200</span>字</p>
+                    	</div>
+                   	<div class="checked" style="float:left;">
+                            <div class="attention">
+                            	<input type="checkbox" checked="checked" name="cbfollow"/>
+                            	<label>是否关注飞利浦中国</label>
+                            </div>
+                    	</div>
+		    </div>
 
                     <div class="btn">
-                        <input class="btn_share" type="submit" value="分享" name="submitshare"/>
+                        <input style="padding:6px 25px;" class="btn_share" type="submit" value="分享" name="submitshare"/>
                     </div>
                 </div>
             </div>
@@ -55,13 +74,13 @@
         }
     else if (ptype == 1)
         {
-       <div class="success_failure">
+       <div class="success_failure successfull">
             <div class="success">
-                <div class="success_content" style="padding-top:100px;">
+                <div class="success_content" style="padding-top:170px;">
                     <i></i>
-                    <h2 class="iconfont icon-duigou1">分享成功</h2>
+                    <h2 class="iconfont icon-duigou1">分享成功 </h2>
                 </div>
-                <p class="time">页面将会在3秒后自动关闭</p>
+                <!--<p class="time">页面将会在3秒后自动关闭</p>-->
             </div>
         </div>
     }
@@ -69,11 +88,11 @@
         {
         <div class="success_failure">
             <div class="failure">
-                <div class="failure_content" style="padding-top:100px;">
+                <div class="failure_content" style="padding-top:170px;">
                     <i></i>
                     <h2 class="iconfont icon-cuowu1">分享失败</h2>
                 </div>
-                <p class="time">页面将会在3秒后自动关闭</p>
+                <!--<p class="time">页面将会在3秒后自动关闭 @TempData["ecode"]</p>-->
             </div>
         </div>
      }
